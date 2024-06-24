@@ -4,6 +4,8 @@
 
 This is a Node.js client library for interacting with the Coinbase Advanced Trade API, providing both REST and WebSocket capabilities. This library is designed to help developers easily integrate Coinbase trading features into their applications.
 
+Based on the [Official Coinbase Python](https://github.com/coinbase/coinbase-advanced-py/tree/master) repository
+
 ## Features
 
 - **REST API Support**: Comprehensive access to Coinbase's REST endpoints. **WIP**
