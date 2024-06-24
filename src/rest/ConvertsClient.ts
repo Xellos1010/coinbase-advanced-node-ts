@@ -1,5 +1,4 @@
-import BaseRestClient from "./BaseRestClient"; 
-import { API_PREFIX } from "../config/constants";
+import BaseRestClient from "./BaseRestClient";
 import { 
   CreateConvertQuoteRequest, 
   CreateConvertQuoteResponse,
@@ -29,7 +28,7 @@ class ConvertsClient extends BaseRestClient {
     userIncentiveId?: string,
     codeVal?: string
   ): Promise<CreateConvertQuoteResponse> {
-    const endpoint = `${API_PREFIX}/convert/quote`;
+    const endpoint = `/convert/quote`;
 
     const data: CreateConvertQuoteRequest = {
       from_account: fromAccount,
@@ -65,14 +64,13 @@ class ConvertsClient extends BaseRestClient {
     toAccount: string,
     additionalParams: object = {}
   ): Promise<GetConvertTradeResponse> {
-    const endpoint = `${API_PREFIX}/convert/trade/${tradeID}`;
+    const endpoint = `/convert/trade/${tradeID}`;
 
     const params: GetConvertTradeParams = {
       from_account: fromAccount,
       to_account: toAccount,
       ...additionalParams,
     };
-
     const queryString = new URLSearchParams(params as any).toString();
     return await this.getRequest(endpoint, queryString);
   }
@@ -95,7 +93,7 @@ class ConvertsClient extends BaseRestClient {
     toAccount: string,
     additionalParams: object = {}
   ): Promise<CommitConvertTradeResponse> {
-    const endpoint = `${API_PREFIX}/convert/trade/${tradeID}`;
+    const endpoint = `/convert/trade/${tradeID}`;
 
     const data: CommitConvertTradeRequest = {
       from_account: fromAccount,
