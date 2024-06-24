@@ -1,8 +1,8 @@
 // test\marketTrades.integration.test.ts
-import CoinbaseClient from "../src/CoinbaseClient";
-import { loadRestConfig } from "../src/config";
-import KeyFileConfig from "../src/config/KeyFileConfig";
-import { startPerformanceTimings, recordStepTiming, writePerformanceDataToFile, Timings } from "./performanceUtils";
+import CoinbaseClient from "../../src/CoinbaseClient";
+import { loadRestConfig } from "../../src/config";
+import KeyFileConfig from "../../src/config/KeyFileConfig";
+import { startPerformanceTimings, recordStepTiming, writePerformanceDataToFile, Timings } from "../performanceUtils";
 
 const keyFile = process.env.KEY_FILENAME;
 const config = loadRestConfig(keyFile); //Loads Key File if any

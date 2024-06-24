@@ -1,8 +1,8 @@
-// test\accounts.integration.test.ts
-import CoinbaseClient from "../src/CoinbaseClient";
-import KeyFileConfig from "../src/config/KeyFileConfig";
-import { loadKeyfile } from "../src/config/KeyLoader";
-import { startPerformanceTimings, recordStepTiming, writePerformanceDataToFile, Timings } from "./performanceUtils";
+import CoinbaseClient from "../../src/CoinbaseClient";
+import KeyFileConfig from "../../src/config/KeyFileConfig";
+import { loadKeyfile } from "../../src/config/KeyLoader";
+import { startPerformanceTimings, recordStepTiming, writePerformanceDataToFile, Timings } from "../performanceUtils";
+import { ListAccountsParams } from "../../src/rest/types/accounts/ListAccountsParams";
 
 const keyFile = process.env.KEY_FILENAME;
 const config = loadKeyfile(keyFile);
@@ -20,7 +20,15 @@ describe('Coinbase API Integration Test - Accounts', () => {
       );
 
       const startListAccounts = performance.now();
-      const accountsData = await client.accounts?.listAccounts();
+
+      // Define the parameters
+      const params: ListAccountsParams = {
+        limit: 5,
+        cursor: undefined,
+        retailPortfolioId: undefined
+      };
+
+      const accountsData = await client.accounts?.listAccounts(params);
       recordStepTiming(timings, 'listAccounts', startListAccounts);
 
       console.log('Fetched accounts data:', JSON.stringify(accountsData, null, 2));

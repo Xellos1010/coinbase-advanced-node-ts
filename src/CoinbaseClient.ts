@@ -1,4 +1,3 @@
-// src/CoinbaseClient.ts
 import BaseClient from "./BaseClient";
 import OrdersClient from "./rest/OrdersClient";
 import ProductsClient from "./rest/ProductsClient";
@@ -28,7 +27,7 @@ class CoinbaseClient extends BaseClient {
     // Public endpoints
     this.public = new Proxy({}, new LazyProxyHandler(() => new PublicClient(this.keyFile), false, this.keyFile));
     
-    //Note: This needs to be loaded with a websocket config so we need to check if the config passed is a websocket config or
+    // Note: This needs to be loaded with a websocket config so we need to check if the config passed is a websocket config or
 
     this.websocket = new Proxy({}, new LazyProxyHandler(() => new BaseWebSocketClient(this.keyFile), true, this.keyFile));
     
@@ -40,6 +39,19 @@ class CoinbaseClient extends BaseClient {
       this.converts = new Proxy({}, new LazyProxyHandler(() => new ConvertsClient(this.keyFile), true, this.keyFile));
       this.payments = new Proxy({}, new LazyProxyHandler(() => new PaymentsClient(this.keyFile), true, this.keyFile));
       this.portfolio = new Proxy({}, new LazyProxyHandler(() => new PortfolioClient(this.keyFile), true, this.keyFile));
+    } else {
+      const handler = {
+        get: function(target: any, prop: string) {
+          throw new Error("Authentication required: keyFile is missing.");
+        }
+      };
+      this.orders = new Proxy({}, handler);
+      this.products = new Proxy({}, handler);
+      this.accounts = new Proxy({}, handler);
+      this.fees = new Proxy({}, handler);
+      this.converts = new Proxy({}, handler);
+      this.payments = new Proxy({}, handler);
+      this.portfolio = new Proxy({}, handler);
     }
   }
 }
