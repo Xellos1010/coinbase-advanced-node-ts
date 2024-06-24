@@ -1,7 +1,7 @@
-import CoinbaseClient from "../../src/CoinbaseClient";
-import { loadRestConfig } from "../../src/config";
-import { startPerformanceTimings, recordStepTiming, writePerformanceDataToFile, Timings } from "../performanceUtils";
-import KeyFileConfig from "../../src/config/KeyFileConfig";
+import CoinbaseClient from "../../../src/CoinbaseClient";
+import { loadRestConfig } from "../../../src/config";
+import { startPerformanceTimings, recordStepTiming, writePerformanceDataToFile, Timings } from "../../performanceUtils";
+import KeyFileConfig from "../../../src/config/KeyFileConfig";
 
 const config = loadRestConfig();
 

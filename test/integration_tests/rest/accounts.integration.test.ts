@@ -1,8 +1,8 @@
-import CoinbaseClient from "../../src/CoinbaseClient";
-import KeyFileConfig from "../../src/config/KeyFileConfig";
-import { loadKeyfile } from "../../src/config/KeyLoader";
-import { startPerformanceTimings, recordStepTiming, writePerformanceDataToFile, Timings } from "../performanceUtils";
-import { ListAccountsParams } from "../../src/rest/types/accounts/ListAccountsParams";
+import CoinbaseClient from "../../../src/CoinbaseClient";
+import KeyFileConfig from "../../../src/config/KeyFileConfig";
+import { loadKeyfile } from "../../../src/config/KeyLoader";
+import { startPerformanceTimings, recordStepTiming, writePerformanceDataToFile, Timings } from "../../performanceUtils";
+import { ListAccountsParams } from "../../../src/rest/types/accounts/ListAccountsParams";
 
 const keyFile = process.env.KEY_FILENAME;
 const config = loadKeyfile(keyFile);
