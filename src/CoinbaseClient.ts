@@ -4,7 +4,7 @@ import ProductsClient from "./rest/ProductsClient";
 import AccountsClient from "./rest/AccountsClient";
 import FeesClient from "./rest/FeesClient";
 import ConvertsClient from "./rest/ConvertsClient";
-import PaymentsClient from "./rest/PaymentsClient";
+import PaymentMethodsClient from "./rest/PaymentMethodsClient";
 import PortfolioClient from "./rest/PortfolioClient";
 import PublicClient from "./rest/PublicClient";
 import KeyFileConfig from "./config/KeyFileConfig";
@@ -18,7 +18,7 @@ class CoinbaseClient extends BaseClient {
   public accounts?: AccountsClient;
   public fees?: FeesClient;
   public converts?: ConvertsClient;
-  public payments?: PaymentsClient;
+  public payments?: PaymentMethodsClient;
   public portfolio?: PortfolioClient;
   public websocket?: BaseWebSocketClient; 
 
@@ -37,7 +37,7 @@ class CoinbaseClient extends BaseClient {
       this.accounts = new Proxy({}, new LazyProxyHandler(() => new AccountsClient(this.keyFile), true, this.keyFile));
       this.fees = new Proxy({}, new LazyProxyHandler(() => new FeesClient(this.keyFile), true, this.keyFile));
       this.converts = new Proxy({}, new LazyProxyHandler(() => new ConvertsClient(this.keyFile), true, this.keyFile));
-      this.payments = new Proxy({}, new LazyProxyHandler(() => new PaymentsClient(this.keyFile), true, this.keyFile));
+      this.payments = new Proxy({}, new LazyProxyHandler(() => new PaymentMethodsClient(this.keyFile), true, this.keyFile));
       this.portfolio = new Proxy({}, new LazyProxyHandler(() => new PortfolioClient(this.keyFile), true, this.keyFile));
     } else {
       const handler = {
