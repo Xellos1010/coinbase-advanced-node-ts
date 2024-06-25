@@ -1,11 +1,6 @@
 import nock from 'nock';
 import ProductsClient from '../../../src/rest/ProductsClient';
-import { GetBestBidAskResponse } from '../../../src/rest/types/products/GetBestBidAskResponse';
-import { ListProductsResponse } from '../../../src/rest/types/products/ListProductsResponse';
-import { GetProductResponse } from '../../../src/rest/types/products/GetProductResponse';
-import { GetProductCandlesResponse } from '../../../src/rest/types/products/GetProductCandlesResponse';
-import { GetMarketTradesResponse } from '../../../src/rest/types/products/GetMarketTrades';
-import { GetProductBookResponse } from '../../../src/rest/types/products/GetProductBookResponse';
+import { GetProductBookParams, GetBestBidAskParams, GetProductBookResponse, GetMarketTradesResponse, GetProductCandlesResponse, GetProductResponse, ListProductsResponse, GetBestBidAskResponse, GetProductCandlesParams } from '../../../src/rest/types/products';
 
 const keyFile = process.env.KEY_FILENAME;
 
@@ -28,14 +23,16 @@ describe('ProductsClient', () => {
       ]
     };
 
-    const productIDs = ['BTC-USD'];
+    const params: GetBestBidAskParams = {
+      product_ids: ['BTC-USD']
+    };
 
     nock('https://api.coinbase.com')
-      .get('/api/v3/brokerage/products/best_bid_ask')
-      .query({ product_ids: productIDs.join(',') })
+      .get('/api/v3/brokerage/best_bid_ask')
+      .query({ product_ids: 'BTC-USD' })
       .reply(200, expectedResponse);
 
-    const bestBidAsk = await client.getBestBidAsk(productIDs);
+    const bestBidAsk = await client.getBestBidAsk(params);
 
     expect(bestBidAsk).toEqual(expectedResponse);
   });
@@ -133,25 +130,28 @@ describe('ProductsClient', () => {
 
   it('should fetch product candles', async () => {
     const client = new ProductsClient(keyFile);
-
+  
     const expectedResponse: GetProductCandlesResponse = {
       candles: [
         { start: '2022-01-01T00:00:00Z', low: '29000.00', high: '31000.00', open: '29500.00', close: '30000.00', volume: '500.0' }
       ]
     };
-
+  
     const productID = 'BTC-USD';
-    const queryParams = { start: '1625097600', end: '1625184000', granularity: 'ONE_HOUR' };
-
+    const queryParams: GetProductCandlesParams = { start: '1625097600', end: '1625184000', granularity: 'ONE_HOUR' };
+  
     nock('https://api.coinbase.com')
       .get(`/api/v3/brokerage/products/${productID}/candles`)
-      .query(queryParams)
+      .query(queryParams as any)
       .reply(200, expectedResponse);
-
+  
     const candles = await client.getProductCandles(productID, queryParams);
-
+  
     expect(candles).toEqual(expectedResponse);
   });
+  
+  
+  
 
   it('should fetch market trades', async () => {
     const client = new ProductsClient(keyFile);
@@ -189,11 +189,11 @@ describe('ProductsClient', () => {
       }
     };
 
-    const queryParams = { product_id: 'BTC-USD', limit: 10 };
+    const queryParams: GetProductBookParams = { product_id: 'BTC-USD', limit: 10 };
 
     nock('https://api.coinbase.com')
-      .get('/api/v3/brokerage/products/product_book')
-      .query(queryParams)
+      .get('/api/v3/brokerage/product_book')
+      .query(queryParams as any)
       .reply(200, expectedResponse);
 
     const productBook = await client.getProductBook(queryParams);
