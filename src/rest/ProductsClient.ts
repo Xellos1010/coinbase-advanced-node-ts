@@ -1,68 +1,116 @@
-import BaseRestClient from "./BaseRestClient"; 
-import { GetBestBidAskResponse } from "./types/products/GetBestBidAskResponse";
-import { ListProductsResponse } from "./types/products/ListProductsResponse";
-import { GetProductResponse } from "./types/products/GetProductResponse";
-import { GetProductCandlesResponse } from "./types/products/GetProductCandlesResponse";
-import { GetMarketTradesResponse } from './types/products/GetMarketTrades';
-import { GetProductBookResponse } from "./types/products/GetProductBookResponse";
+import BaseRestClient from "./BaseRestClient";
+import {
+  GetBestBidAskResponse,
+  ListProductsResponse,
+  GetProductResponse,
+  GetProductCandlesResponse,
+  GetMarketTradesResponse,
+  GetProductBookResponse,
+  GetBestBidAskParams,
+  ListProductsParams,
+  GetProductCandlesParams,
+  GetMarketTradesParams,
+  GetProductBookParams
+} from "./types/products";
 
 class ProductsClient extends BaseRestClient {
-  async getBestBidAsk(productIDs?: string[]): Promise<GetBestBidAskResponse> {
-    let queryString = "";
-    if (productIDs && productIDs.length > 0) {
-      queryString = productIDs.map((id) => `product_ids=${id}`).join("&");
-    }
-    return await this.getRequest(
-      "/best_bid_ask",
-      `${queryString ? `?${queryString}` : ""}`
-    );
+  /**
+   * **Get Best Bid Ask**
+   * 
+   * [GET] https://api.coinbase.com/api/v3/brokerage/products/best_bid_ask
+   * 
+   * **Description:**
+   * 
+   * Retrieve the best bid and ask prices for a list of products.
+   * 
+   * @param params - Optional parameters for filtering the results
+   * @returns Promise resolving to the best bid and ask prices
+   */
+  async getBestBidAsk(params?: GetBestBidAskParams): Promise<GetBestBidAskResponse> {
+    const queryParams = params?.product_ids ? { product_ids: params.product_ids.join(",") } : {};
+    return await this.getRequest<GetBestBidAskResponse>("/best_bid_ask", queryParams);
   }
 
-  async listProducts(): Promise<ListProductsResponse> {
-    return await this.getRequest(`/products`);
+  /**
+   * **List Products**
+   * 
+   * [GET] https://api.coinbase.com/api/v3/brokerage/products
+   * 
+   * **Description:**
+   * 
+   * Get a list of available products.
+   * 
+   * @param params - Optional parameters for filtering the results
+   * @returns Promise resolving to the list of products
+   */
+  async listProducts(params?: ListProductsParams): Promise<ListProductsResponse> {
+    return await this.getRequest<ListProductsResponse>('/products', params);
   }
 
+  /**
+   * **Get Product**
+   * 
+   * [GET] https://api.coinbase.com/api/v3/brokerage/products/{productID}
+   * 
+   * **Description:**
+   * 
+   * Retrieve information about a specific product.
+   * 
+   * @param productID - The ID of the product to retrieve
+   * @returns Promise resolving to the product information
+   */
   async getProduct(productID: string): Promise<GetProductResponse> {
-    return await this.getRequest(`/products/${productID}`);
+    return await this.getRequest<GetProductResponse>(`/products/${productID}`);
   }
 
-  async getProductCandles(productID: string, queryParams?: object): Promise<GetProductCandlesResponse> {
-    let queryString = "";
-    if (queryParams && Object.keys(queryParams).length > 0) {
-      queryString = Object.entries(queryParams)
-        .map(([key, value]) => `${key}=${value}`)
-        .join("&");
-    }
-    return await this.getRequest(
-      `/products/${productID}/candles`,
-      `${queryString ? `?${queryString}` : ""}`
-    );
+  /**
+   * **Get Product Candles**
+   * 
+   * [GET] https://api.coinbase.com/api/v3/brokerage/products/{productID}/candles
+   * 
+   * **Description:**
+   * 
+   * Retrieve historical candlestick data for a specific product.
+   * 
+   * @param productID - The ID of the product
+   * @param params - Optional query parameters for filtering the results
+   * @returns Promise resolving to the candlestick data
+   */
+  async getProductCandles(productID: string, params: GetProductCandlesParams): Promise<GetProductCandlesResponse> {
+    return await this.getRequest<GetProductCandlesResponse>(`/products/${productID}/candles`, params);
   }
 
-  async getMarketTrades(productID: string, queryParams?: object): Promise<GetMarketTradesResponse> {
-    let queryString = "";
-    if (queryParams && Object.keys(queryParams).length > 0) {
-      queryString = Object.entries(queryParams)
-        .map(([key, value]) => `${key}=${value}`)
-        .join("&");
-    }
-    return await this.getRequest(
-      `/products/${productID}/ticker`,
-      `${queryString ? `?${queryString}` : ""}`
-    );
+  /**
+   * **Get Market Trades**
+   * 
+   * [GET] https://api.coinbase.com/api/v3/brokerage/products/{productID}/ticker
+   * 
+   * **Description:**
+   * 
+   * Retrieve recent market trades for a specific product.
+   * 
+   * @param productID - The ID of the product
+   * @param params - Optional query parameters for filtering the results
+   * @returns Promise resolving to the market trades
+   */
+  async getMarketTrades(productID: string, params: GetMarketTradesParams): Promise<GetMarketTradesResponse> {
+    return await this.getRequest<GetMarketTradesResponse>(`/products/${productID}/ticker`, params);
   }
 
-  async getProductBook(queryParams?: object): Promise<GetProductBookResponse> {
-    let queryString = "";
-    if (queryParams && Object.keys(queryParams).length > 0) {
-      queryString = Object.entries(queryParams)
-        .map(([key, value]) => `${key}=${value}`)
-        .join("&");
-    }
-    return await this.getRequest(
-      `/product_book`,
-      `${queryString ? `?${queryString}` : ""}`
-    );
+  /**
+   * **Get Product Book**
+   * 
+   * [GET] https://api.coinbase.com/api/v3/brokerage/products/product_book
+   * 
+   * **Description:**
+   * 
+   * Retrieve the order book for a specific product.
+   * 
+   * @param params - Optional query parameters for filtering the results
+   * @returns Promise resolving to the product book
+   */
+  async getProductBook(params: GetProductBookParams): Promise<GetProductBookResponse> {
+    return await this.getRequest<GetProductBookResponse>('/product_book', params);
   }
 }
 

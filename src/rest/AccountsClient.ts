@@ -1,7 +1,5 @@
 import BaseRestClient from "./BaseRestClient";
-import { ListAccountsParams } from "./types/accounts/ListAccountsParams";
-import { GetAccountResponse } from "./types/accounts/GetAccountResponse";
-import { ListAccountsResponse } from "./types/accounts/ListAccountsResponse";
+import { ListAccountsParams, GetAccountResponse, ListAccountsResponse } from "./types/accounts";
 
 class AccountsClient extends BaseRestClient {
   /**
@@ -13,30 +11,24 @@ class AccountsClient extends BaseRestClient {
    * 
    * Get a list of authenticated accounts for the current user.
    * 
-   * **Read more on the official documentation:** 
-   * https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getaccounts
-   * 
    * @param params - Optional parameters for filtering accounts
    * @returns Promise resolving to the list of accounts
    */
   async listAccounts(params?: ListAccountsParams): Promise<ListAccountsResponse> {
-    const queryParams = new URLSearchParams();
+    const url = '/accounts';
+    const queryParams: { [key: string]: string } = {};
     if (params) {
       if (params.limit !== undefined && params.limit !== 0) {
-        queryParams.append('limit', params.limit.toString());
+        queryParams.limit = params.limit.toString();
       }
-      if (params.cursor && params.cursor !== undefined) {
-        queryParams.append('cursor', params.cursor);
+      if (params.cursor) {
+        queryParams.cursor = params.cursor;
       }
-      if (params.retailPortfolioId && params.cursor !== undefined) {
-        queryParams.append('retail_portfolio_id', params.retailPortfolioId);
+      if (params.retailPortfolioId) {
+        queryParams.retail_portfolio_id = params.retailPortfolioId; // Ensure correct parameter format
       }
     }
-
-    const queryString = queryParams.toString();
-    const url = '/accounts';
-    
-    return await this.getRequest(url, queryString);
+    return await this.getRequest<ListAccountsResponse>(url, queryParams);
   }
 
   /**
@@ -48,14 +40,11 @@ class AccountsClient extends BaseRestClient {
    * 
    * Get a list of information about an account, given an account UUID.
    * 
-   * **Read more on the official documentation:** 
-   * https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getaccount
-   * 
    * @param accountUUID - The UUID of the account to retrieve
    * @returns Promise resolving to the account information
    */
   async getAccount(accountUUID: string): Promise<GetAccountResponse> {
-    return await this.getRequest(`/accounts/${accountUUID}`);
+    return await this.getRequest<GetAccountResponse>(`/accounts/${accountUUID}`);
   }
 }
 

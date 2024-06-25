@@ -11,15 +11,12 @@ import {
 class ConvertsClient extends BaseRestClient {
   /**
    * **Create Convert Quote**
-   * ________________________
    * 
    * [POST] https://api.coinbase.com/api/v3/brokerage/convert/quote
    * 
    * **Description:**
    * 
    * Create a convert quote with a specified source currency, target currency, and amount.
-   * 
-   * **Read more on the official documentation:** `Create Convert Quote <https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_createconvertquote>`_
    */
   async createConvertQuote(
     fromAccount: string,
@@ -43,20 +40,17 @@ class ConvertsClient extends BaseRestClient {
       };
     }
 
-    return await this.postRequest(endpoint, data);
+    return await this.postRequest<CreateConvertQuoteResponse>(endpoint, data);
   }
 
   /**
    * **Get Convert Trade**
-   * _____________________
    * 
    * [GET] https://api.coinbase.com/api/v3/brokerage/convert/trade/{trade_id}
    * 
    * **Description:**
    * 
    * Gets a list of information about a convert trade with a specified trade ID, source currency, and target currency.
-   * 
-   * **Read more on the official documentation:** `Get Convert Trade <https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_getconverttrade>`_
    */
   async getConvertTrade(
     tradeID: string,
@@ -71,21 +65,18 @@ class ConvertsClient extends BaseRestClient {
       to_account: toAccount,
       ...additionalParams,
     };
-    const queryString = new URLSearchParams(params as any).toString();
-    return await this.getRequest(endpoint, queryString);
+    
+    return await this.getRequest<GetConvertTradeResponse>(endpoint, params);
   }
 
   /**
    * **Commit Convert Trade**
-   * ________________________
    * 
    * [POST] https://api.coinbase.com/api/v3/brokerage/convert/trade/{trade_id}
    * 
    * **Description:**
    * 
    * Commits a convert trade with a specified trade ID, source currency, and target currency.
-   * 
-   * **Read more on the official documentation:** `Commit Convert Trade <https://docs.cdp.coinbase.com/advanced-trade/reference/retailbrokerageapi_commitconverttrade>`_
    */
   async commitConvertTrade(
     tradeID: string,
@@ -101,7 +92,7 @@ class ConvertsClient extends BaseRestClient {
       ...additionalParams,
     };
 
-    return await this.postRequest(endpoint, data);
+    return await this.postRequest<CommitConvertTradeResponse>(endpoint, data);
   }
 }
 

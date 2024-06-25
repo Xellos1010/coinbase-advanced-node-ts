@@ -61,7 +61,7 @@ describe('AccountsClient', () => {
       .query({
         limit: params.limit?.toString(),
         cursor: params.cursor,
-        retail_portfolio_id: params.retailPortfolioId
+        retail_portfolio_id: params.retailPortfolioId // Ensure snake_case here
       })
       .reply(200, expectedResponse);
 

@@ -1,24 +1,60 @@
 import { randomBytes } from "crypto";
-import BaseRestClient from "./BaseRestClient"; 
-import { GetOrderResponse } from "./types/orders/GetOrderResponse";
-import { ListOrdersResponse } from "./types/orders/ListOrdersResponse";
-import { EditOrderResponse } from "./types/orders/EditOrderResponse";
-import { CancelOrdersResponse } from "./types/orders/CancelOrdersResponse";
-import { CreateOrderResponse } from "./types/orders/CreateOrderResponse";
-import { ListFillsResponse } from "./types/orders/ListFillsResponse";
-import { PreviewOrderResponse } from './types/orders/PreviewOrder';
+import BaseRestClient from "./BaseRestClient";
+import {
+  GetOrderResponse,
+  ListOrdersResponse,
+  EditOrderResponse,
+  CancelOrdersResponse,
+  CreateOrderResponse,
+  ListFillsResponse,
+  PreviewOrderResponse
+} from "./types/orders";
 
 class OrdersClient extends BaseRestClient {
+  /**
+   * **Generate Client Order ID**
+   * 
+   * Generates a unique client order ID.
+   * 
+   * @returns Promise resolving to the generated client order ID
+   */
   async generateClientOrderID(): Promise<string> {
     const timestamp = new Date().toISOString().replace(/[-:.TZ]/g, "");
     const randomPart = randomBytes(8).toString("hex");
     return `${timestamp}-${randomPart}`;
   }
 
+  /**
+   * **Create Order**
+   * 
+   * [POST] https://api.coinbase.com/api/v3/brokerage/orders
+   * 
+   * **Description:**
+   * 
+   * Create a new order.
+   * 
+   * @param orderData - The data for the order to create
+   * @returns Promise resolving to the created order
+   */
   async createOrder(orderData: object): Promise<CreateOrderResponse> {
-    return await this.postRequest(`/orders`, orderData);
+    return await this.postRequest<CreateOrderResponse>(`/orders`, orderData);
   }
 
+  /**
+   * **Create Buy Order**
+   * 
+   * [POST] https://api.coinbase.com/api/v3/brokerage/orders
+   * 
+   * **Description:**
+   * 
+   * Create a new buy order.
+   * 
+   * @param productID - The ID of the product to buy
+   * @param baseSize - The base size of the order
+   * @param clientOrderID - The client order ID
+   * @param orderConfig - The configuration for the order
+   * @returns Promise resolving to the created buy order
+   */
   async createBuyOrder(
     productID: string,
     baseSize: string,
@@ -41,6 +77,21 @@ class OrdersClient extends BaseRestClient {
     return await this.createOrder(orderData);
   }
 
+  /**
+   * **Create Sell Order**
+   * 
+   * [POST] https://api.coinbase.com/api/v3/brokerage/orders
+   * 
+   * **Description:**
+   * 
+   * Create a new sell order.
+   * 
+   * @param productID - The ID of the product to sell
+   * @param baseSize - The base size of the order
+   * @param clientOrderID - The client order ID
+   * @param orderConfig - The configuration for the order
+   * @returns Promise resolving to the created sell order
+   */
   async createSellOrder(
     productID: string,
     baseSize: string,
@@ -63,10 +114,38 @@ class OrdersClient extends BaseRestClient {
     return await this.createOrder(orderData);
   }
 
+  /**
+   * **Preview Order**
+   * 
+   * [POST] https://api.coinbase.com/api/v3/brokerage/orders/preview
+   * 
+   * **Description:**
+   * 
+   * Preview an order.
+   * 
+   * @param orderData - The data for the order to preview
+   * @returns Promise resolving to the preview of the order
+   */
   async previewOrder(orderData: object): Promise<PreviewOrderResponse> {
-    return await this.postRequest(`/orders/preview`, orderData);
+    return await this.postRequest<PreviewOrderResponse>(`/orders/preview`, orderData);
   }
 
+  /**
+   * **Preview Buy Order**
+   * 
+   * [POST] https://api.coinbase.com/api/v3/brokerage/orders/preview
+   * 
+   * **Description:**
+   * 
+   * Preview a new buy order.
+   * 
+   * @param product_id - The ID of the product to buy
+   * @param base_size - The base size of the order
+   * @param client_order_id - The client order ID
+   * @param order_configuration - The configuration for the order
+   * @param commission_rate - Optional commission rate for the order
+   * @returns Promise resolving to the preview of the buy order
+   */
   async previewBuyOrder(
     product_id: string,
     base_size: string,
@@ -97,6 +176,22 @@ class OrdersClient extends BaseRestClient {
     return await this.previewOrder(orderData);
   }
 
+  /**
+   * **Preview Sell Order**
+   * 
+   * [POST] https://api.coinbase.com/api/v3/brokerage/orders/preview
+   * 
+   * **Description:**
+   * 
+   * Preview a new sell order.
+   * 
+   * @param product_id - The ID of the product to sell
+   * @param base_size - The base size of the order
+   * @param client_order_id - The client order ID
+   * @param order_configuration - The configuration for the order
+   * @param commission_rate - Optional commission rate for the order
+   * @returns Promise resolving to the preview of the sell order
+   */
   async previewSellOrder(
     product_id: string,
     base_size: string,
@@ -127,43 +222,105 @@ class OrdersClient extends BaseRestClient {
     return await this.previewOrder(orderData);
   }
 
+  /**
+   * **Cancel Orders**
+   * 
+   * [POST] https://api.coinbase.com/api/v3/brokerage/orders/batch_cancel
+   * 
+   * **Description:**
+   * 
+   * Cancel a batch of orders.
+   * 
+   * @param orderIDs - The IDs of the orders to cancel
+   * @returns Promise resolving to the cancellation response
+   */
   async cancelOrders(orderIDs: string[]): Promise<CancelOrdersResponse> {
     const data = { order_ids: orderIDs };
-    return await this.postRequest(`/orders/batch_cancel`, data);
+    return await this.postRequest<CancelOrdersResponse>(`/orders/batch_cancel`, data);
   }
 
+  /**
+   * **Edit Order**
+   * 
+   * [POST] https://api.coinbase.com/api/v3/brokerage/orders/edit
+   * 
+   * **Description:**
+   * 
+   * Edit an existing order.
+   * 
+   * @param orderID - The ID of the order to edit
+   * @param newData - The new data for the order
+   * @returns Promise resolving to the edited order
+   */
   async editOrder(orderID: string, newData: object): Promise<EditOrderResponse> {
     const data = { order_id: orderID, ...newData };
-    return await this.postRequest(`/orders/edit`, data);
+    return await this.postRequest<EditOrderResponse>(`/orders/edit`, data);
   }
 
+  /**
+   * **Preview Edit Order**
+   * 
+   * [POST] https://api.coinbase.com/api/v3/brokerage/orders/edit_preview
+   * 
+   * **Description:**
+   * 
+   * Preview the edit of an existing order.
+   * 
+   * @param orderID - The ID of the order to edit
+   * @param newData - The new data for the order
+   * @returns Promise resolving to the preview of the edited order
+   */
   async previewEditOrder(orderID: string, newData: object): Promise<PreviewOrderResponse> {
     const data = { order_id: orderID, ...newData };
-    return await this.postRequest(`/orders/edit_preview`, data);
+    return await this.postRequest<PreviewOrderResponse>(`/orders/edit_preview`, data);
   }
 
+  /**
+   * **List Orders**
+   * 
+   * [GET] https://api.coinbase.com/api/v3/brokerage/orders/historical/batch
+   * 
+   * **Description:**
+   * 
+   * Retrieve a list of historical orders.
+   * 
+   * @param queryParams - Optional query parameters for filtering the results
+   * @returns Promise resolving to the list of historical orders
+   */
   async listOrders(queryParams?: object): Promise<ListOrdersResponse> {
-    let queryString = "";
-    if (queryParams && Object.keys(queryParams).length > 0) {
-      queryString = Object.entries(queryParams)
-        .map(([key, value]) => `${key}=${value}`)
-        .join("&");
-    }
-    return await this.getRequest(`/orders/historical/batch`, queryString ? `?${queryString}` : "");
+    return await this.getRequest<ListOrdersResponse>(`/orders/historical/batch`, queryParams);
   }
 
+  /**
+   * **List Fills**
+   * 
+   * [GET] https://api.coinbase.com/api/v3/brokerage/orders/historical/fills
+   * 
+   * **Description:**
+   * 
+   * Retrieve a list of fills.
+   * 
+   * @param queryParams - Optional query parameters for filtering the results
+   * @returns Promise resolving to the list of fills
+   */
   async listFills(queryParams?: object): Promise<ListFillsResponse> {
-    let queryString = "";
-    if (queryParams && Object.keys(queryParams).length > 0) {
-      queryString = Object.entries(queryParams)
-        .map(([key, value]) => `${key}=${value}`)
-        .join("&");
-    }
-    return await this.getRequest(`/orders/historical/fills`, queryString ? `?${queryString}` : "");
+    return await this.getRequest<ListFillsResponse>(`/orders/historical/fills`, queryParams);
   }
 
+  /**
+   * **Get Order**
+   * 
+   * [GET] https://api.coinbase.com/api/v3/brokerage/orders/historical/{orderID}
+   * 
+   * **Description:**
+   * 
+   * Retrieve information about a specific order.
+   * 
+   * @param orderID - The ID of the order to retrieve
+   * @returns Promise resolving to the order information
+   */
   async getOrder(orderID: string): Promise<GetOrderResponse> {
-    return await this.getRequest(`/orders/historical/${orderID}`);
+    return await this.getRequest<GetOrderResponse>(`/orders/historical/${orderID}`);
   }
 }
 

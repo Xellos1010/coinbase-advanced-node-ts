@@ -1,10 +1,8 @@
-// src\BaseClient.ts
 import { sign } from "jsonwebtoken";
 import * as crypto from "crypto";
 import axios, { AxiosRequestConfig, Method, AxiosResponse } from "axios";
 import KeyFileConfig from "./config/KeyFileConfig";
 import { loadKeyfile } from "./config/KeyLoader";
-// import logger from "./utils/logger"; // import logger
 
 class BaseClient {
   protected keyFile?: KeyFileConfig;
@@ -61,15 +59,24 @@ class BaseClient {
     return `${method} ${this.baseURL}${path}`;
   }
 
-  protected async sendRequest(
+  private objectToQueryString(params: object): string {
+    const queryParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      queryParams.append(key, value == null || value === '' ? '' : String(value));
+    });
+    return queryParams.toString();
+  }
+
+  protected async sendRequest<T>(
     httpMethod: Method,
     urlPath: string,
     params: object = {},
     headers: object = {},
     data: object = {},
     retries = 3
-  ): Promise<any> {
-    const url = `https://${this.baseURL}${urlPath}`;
+  ): Promise<T> {
+    const queryString = this.objectToQueryString(params);
+    const url = `https://${this.baseURL}${urlPath}${queryString ? `?${queryString}` : ''}`;
     const initialBackoff = 1000;
     let attempts = 0;
 
@@ -78,7 +85,7 @@ class BaseClient {
         const config: AxiosRequestConfig = {
           method: httpMethod,
           url,
-          params,
+          params: {}, // Ensure axios does not add query params
           headers,
           data,
           timeout: 10000,
@@ -101,32 +108,32 @@ class BaseClient {
     throw new Error("Max retries exceeded");
   }
 
-  protected async executeAuthenticatedRequest(
+  protected async executeAuthenticatedRequest<T>(
     method: Method,
     path: string,
-    queryString?: string,
+    params: object = {},
     data?: object,
     retries = 3
-  ): Promise<any> {
+  ): Promise<T> {
     const token = this.generateJWT(method, path);
     const headers = {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     };
-    return this.sendRequest(method, path + (queryString ? `?${queryString}` : ''), {}, headers, data, retries);
+    return this.sendRequest<T>(method, path, params, headers, data, retries);
   }
 
-  protected async executePublicRequest(
+  protected async executePublicRequest<T>(
     method: Method,
     path: string,
-    queryString?: string,
+    params: object = {},
     data?: object,
     retries = 3
-  ): Promise<any> {
+  ): Promise<T> {
     const headers = {
       "Content-Type": "application/json",
     };
-    return this.sendRequest(method, path + (queryString ? `?${queryString}` : ''), {}, headers, data, retries);
+    return this.sendRequest<T>(method, path, params, headers, data, retries);
   }
 
   private async sleep(ms: number) {
@@ -139,28 +146,28 @@ class BaseClient {
     }
   }
 
-  protected async getRequest(path: string, queryString?: string) {
-    return await this.executeAuthenticatedRequest("GET", path, queryString);
+  protected async getRequest<T>(path: string, params: object = {}): Promise<T> {
+    return await this.executeAuthenticatedRequest<T>("GET", path, params);
   }
 
-  protected async postRequest(path: string, data: object, queryString?: string) {
-    return await this.executeAuthenticatedRequest("POST", path, queryString, data);
+  protected async postRequest<T>(path: string, data: object, params: object = {}): Promise<T> {
+    return await this.executeAuthenticatedRequest<T>("POST", path, params, data);
   }
 
-  protected async putRequest(path: string, data: object, queryString?: string) {
-    return await this.executeAuthenticatedRequest("PUT", path, queryString, data);
+  protected async putRequest<T>(path: string, data: object, params: object = {}): Promise<T> {
+    return await this.executeAuthenticatedRequest<T>("PUT", path, params, data);
   }
 
-  protected async deleteRequest(path: string, queryString?: string) {
-    return await this.executeAuthenticatedRequest("DELETE", path, queryString);
+  protected async deleteRequest<T>(path: string, params: object = {}): Promise<T> {
+    return await this.executeAuthenticatedRequest<T>("DELETE", path, params);
   }
 
-  protected async getPublicRequest(path: string, queryString?: string) {
-    return await this.executePublicRequest("GET", path, queryString);
+  protected async getPublicRequest<T>(path: string, params: object = {}): Promise<T> {
+    return await this.executePublicRequest<T>("GET", path, params);
   }
 
-  protected async postPublicRequest(path: string, data: object, queryString?: string) {
-    return await this.executePublicRequest("POST", path, queryString, data);
+  protected async postPublicRequest<T>(path: string, data: object, params: object = {}): Promise<T> {
+    return await this.executePublicRequest<T>("POST", path, params, data);
   }
 }
 
