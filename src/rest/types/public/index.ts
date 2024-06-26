@@ -5,3 +5,4 @@ export * from './ProductBookResponse';
 export * from './ProductsResponse';
 export * from './ProductResponse';
 export * from './ProductCandlesResponse';
+export * from './publicParams'

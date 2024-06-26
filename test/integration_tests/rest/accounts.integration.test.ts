@@ -50,6 +50,7 @@ describe('Coinbase API Integration Test - Accounts', () => {
       } else {
         console.error('Unexpected error:', error);
       }
+      fail(error);
     } finally {
       timings.endTime = performance.now();
       writePerformanceDataToFile('coinbaseIntegrationTest_accounts', timings);

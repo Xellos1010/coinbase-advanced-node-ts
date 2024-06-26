@@ -5,7 +5,10 @@ import {
   ProductBookResponse,
   ProductsResponse,
   ProductResponse,
-  ProductCandlesResponse
+  ProductCandlesResponse,
+  GetProductBookParams,
+  GetProductCandlesParams,
+  GetMarketTradesParams
 } from './types/public';
 
 class PublicClient extends BaseRestClient {
@@ -33,14 +36,13 @@ class PublicClient extends BaseRestClient {
    * 
    * Retrieve the order book for a specific product.
    * 
-   * @param productID - The ID of the product
-   * @param limit - Optional limit on the number of entries to retrieve
+   * @param params - The parameters for the request
    * @returns Promise resolving to the product book
    */
-  async getProductBook(productID: string, limit?: number): Promise<ProductBookResponse> {
-    const queryParams = new URLSearchParams({ product_id: productID });
-    if (limit) queryParams.append("limit", limit.toString());
-    return await this.getPublicRequest<ProductBookResponse>(`/market/product_book?${queryParams.toString()}`);
+  async getProductBook(params: GetProductBookParams): Promise<ProductBookResponse> {
+    const { productID, limit } = params;
+    const queryParams = { product_id: productID, limit: limit ? limit.toString() : undefined };
+    return await this.getPublicRequest<ProductBookResponse>(`/market/product_book`, queryParams);
   }
 
   /**
@@ -83,15 +85,13 @@ class PublicClient extends BaseRestClient {
    * 
    * Retrieve historical candlestick data for a specific product.
    * 
-   * @param productID - The ID of the product
-   * @param start - Start time for the candlestick data
-   * @param end - End time for the candlestick data
-   * @param granularity - Granularity of the candlestick data
+   * @param params - The parameters for the request
    * @returns Promise resolving to the candlestick data
    */
-  async getProductCandles(productID: string, start: string, end: string, granularity: string): Promise<ProductCandlesResponse> {
-    const queryParams = new URLSearchParams({ start, end, granularity });
-    return await this.getPublicRequest<ProductCandlesResponse>(`/market/products/${productID}/candles?${queryParams.toString()}`);
+  async getProductCandles(params: GetProductCandlesParams): Promise<ProductCandlesResponse> {
+    const { productID, start, end, granularity } = params;
+    const queryParams = { start, end, granularity };
+    return await this.getPublicRequest<ProductCandlesResponse>(`/market/products/${productID}/candles`, queryParams);
   }
 
   /**
@@ -103,13 +103,13 @@ class PublicClient extends BaseRestClient {
    * 
    * Retrieve recent market trades for a specific product.
    * 
-   * @param productID - The ID of the product
-   * @param limit - Limit on the number of trades to retrieve
+   * @param params - The parameters for the request
    * @returns Promise resolving to the market trades
    */
-  async getMarketTrades(productID: string, limit: number): Promise<MarketTradesResponse> {
-    const queryParams = new URLSearchParams({ limit: limit.toString() });
-    return await this.getPublicRequest<MarketTradesResponse>(`/market/products/${productID}/ticker?${queryParams.toString()}`);
+  async getMarketTrades(params: GetMarketTradesParams): Promise<MarketTradesResponse> {
+    const { productID, limit } = params;
+    const queryParams = { limit: limit.toString() };
+    return await this.getPublicRequest<MarketTradesResponse>(`/market/products/${productID}/ticker`, queryParams);
   }
 }
 

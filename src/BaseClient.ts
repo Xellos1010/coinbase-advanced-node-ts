@@ -62,10 +62,18 @@ class BaseClient {
   private objectToQueryString(params: object): string {
     const queryParams = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
-      queryParams.append(key, value == null || value === '' ? '' : String(value));
+      if (value instanceof Date) {
+        queryParams.append(key, value.toISOString());
+      } else if (typeof value === 'number') {
+        queryParams.append(key, value.toString());
+      } else if (value !== null && value !== undefined && value !== '') {
+        queryParams.append(key, String(value));
+      }
     });
     return queryParams.toString();
   }
+  
+  
 
   protected async sendRequest<T>(
     httpMethod: Method,

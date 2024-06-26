@@ -8,6 +8,11 @@ import {
   ProductCandlesResponse,
   MarketTradesResponse
 } from '../../../src/rest/types/public';
+import {
+  GetProductBookParams,
+  GetProductCandlesParams,
+  GetMarketTradesParams
+} from '../../../src/rest/types/public/publicParams';
 
 const keyFile = process.env.KEY_FILENAME;
 
@@ -37,6 +42,7 @@ describe('PublicClient', () => {
   it('should fetch product book', async () => {
     const client = new PublicClient(keyFile);
 
+    const params: GetProductBookParams = { productID: 'BTC-USD', limit: 10 };
     const expectedResponse: ProductBookResponse = {
       product_id: 'BTC-USD',
       bids: [{ price: '30000.00', size: '1.0' }],
@@ -46,10 +52,10 @@ describe('PublicClient', () => {
 
     nock('https://api.coinbase.com')
       .get('/api/v3/brokerage/market/product_book')
-      .query({ product_id: 'BTC-USD' })
+      .query({ product_id: 'BTC-USD', limit: '10' })
       .reply(200, expectedResponse);
 
-    const productBook = await client.getProductBook('BTC-USD');
+    const productBook = await client.getProductBook(params);
 
     expect(productBook).toEqual(expectedResponse);
   });
@@ -141,6 +147,12 @@ describe('PublicClient', () => {
   it('should fetch product candles', async () => {
     const client = new PublicClient(keyFile);
 
+    const params: GetProductCandlesParams = {
+      productID: 'BTC-USD',
+      start: '2023-06-24T00:00:00Z',
+      end: '2023-06-25T00:00:00Z',
+      granularity: 'ONE_HOUR'
+    };
     const expectedResponse: ProductCandlesResponse = {
       candles: [
         {
@@ -163,7 +175,7 @@ describe('PublicClient', () => {
       })
       .reply(200, expectedResponse);
 
-    const productCandles = await client.getProductCandles('BTC-USD', '2023-06-24T00:00:00Z', '2023-06-25T00:00:00Z', '86400');
+    const productCandles = await client.getProductCandles(params);
 
     expect(productCandles).toEqual(expectedResponse);
   });
@@ -171,6 +183,7 @@ describe('PublicClient', () => {
   it('should fetch market trades', async () => {
     const client = new PublicClient(keyFile);
 
+    const params: GetMarketTradesParams = { productID: 'BTC-USD', limit: 10 };
     const expectedResponse: MarketTradesResponse = {
       trades: [
         {
@@ -191,7 +204,7 @@ describe('PublicClient', () => {
       .query({ limit: '10' })
       .reply(200, expectedResponse);
 
-    const marketTrades = await client.getMarketTrades('BTC-USD', 10);
+    const marketTrades = await client.getMarketTrades(params);
 
     expect(marketTrades).toEqual(expectedResponse);
   });

@@ -2,6 +2,7 @@ import CoinbaseClient from "../../../src/CoinbaseClient";
 import { loadRestConfig } from "../../../src/config";
 import { startPerformanceTimings, recordStepTiming, writePerformanceDataToFile, Timings } from "../../performanceUtils";
 import KeyFileConfig from "../../../src/config/KeyFileConfig";
+import { GetMarketTradesParams, GetProductBookParams, GetProductCandlesParams } from "../../../src/rest/types/public";
 
 const config = loadRestConfig();
 
@@ -10,9 +11,9 @@ describe("Coinbase API Public Integration Test", () => {
 
   beforeAll(() => {
     client = new CoinbaseClient(KeyFileConfig.getInstance(
-        config.name,
-        config.privateKey
-      ));
+      config.name,
+      config.privateKey
+    ));
   });
 
   it("should fetch server time", async () => {
@@ -26,6 +27,7 @@ describe("Coinbase API Public Integration Test", () => {
       console.log("Server Time:", serverTime);
     } catch (error) {
       console.error("Error fetching server time:", error);
+      fail(error);
     } finally {
       timings.endTime = performance.now();
       writePerformanceDataToFile('publicIntegrationTest_getServerTime', timings);
@@ -36,13 +38,15 @@ describe("Coinbase API Public Integration Test", () => {
     const timings: Timings = startPerformanceTimings();
 
     try {
+      const params: GetProductBookParams = { productID: 'BTC-USD', limit: 10 };
       const startProductBook = performance.now();
-      const productBook = await client.public?.getProductBook('BTC-USD', 10);
+      const productBook = await client.public?.getProductBook(params);
       recordStepTiming(timings, 'getProductBook', startProductBook);
 
       console.log("Product Book:", productBook);
     } catch (error) {
       console.error("Error fetching product book:", error);
+      fail(error);
     } finally {
       timings.endTime = performance.now();
       writePerformanceDataToFile('publicIntegrationTest_getProductBook', timings);
@@ -60,6 +64,7 @@ describe("Coinbase API Public Integration Test", () => {
       console.log("Products:", products);
     } catch (error) {
       console.error("Error listing products:", error);
+      fail(error);
     } finally {
       timings.endTime = performance.now();
       writePerformanceDataToFile('publicIntegrationTest_listProducts', timings);
@@ -87,6 +92,7 @@ describe("Coinbase API Public Integration Test", () => {
       console.log("Product:", product);
     } catch (error) {
       console.error("Error fetching product:", error);
+      fail(error);
     } finally {
       timings.endTime = performance.now();
       writePerformanceDataToFile('publicIntegrationTest_getProduct', timings);
@@ -97,17 +103,21 @@ describe("Coinbase API Public Integration Test", () => {
     const timings: Timings = startPerformanceTimings();
 
     try {
-      const start = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(); // 24 hours ago
-      const end = new Date().toISOString();
-      const granularity = '3600'; // 1 hour granularity
+      const params: GetProductCandlesParams = {
+        productID: 'BTC-USD',
+        start: Math.floor(Date.now() / 1000 - 24 * 60 * 60).toString(), // 24 hours ago in UNIX time
+        end: Math.floor(Date.now() / 1000).toString(), // Now in UNIX time
+        granularity: 'ONE_HOUR' // 1 hour granularity
+      };
 
       const startGetProductCandles = performance.now();
-      const candles = await client.public?.getProductCandles('BTC-USD', start, end, granularity);
+      const candles = await client.public?.getProductCandles(params);
       recordStepTiming(timings, 'getProductCandles', startGetProductCandles);
 
       console.log("Product Candles:", candles);
     } catch (error) {
       console.error("Error fetching product candles:", error);
+      fail(error);
     } finally {
       timings.endTime = performance.now();
       writePerformanceDataToFile('publicIntegrationTest_getProductCandles', timings);
@@ -118,13 +128,15 @@ describe("Coinbase API Public Integration Test", () => {
     const timings: Timings = startPerformanceTimings();
 
     try {
+      const params: GetMarketTradesParams = { productID: 'BTC-USD', limit: 10 };
       const startGetMarketTrades = performance.now();
-      const marketTrades = await client.public?.getMarketTrades('BTC-USD', 10);
+      const marketTrades = await client.public?.getMarketTrades(params);
       recordStepTiming(timings, 'getMarketTrades', startGetMarketTrades);
 
       console.log("Market Trades:", marketTrades);
     } catch (error) {
       console.error("Error fetching market trades:", error);
+      fail(error);
     } finally {
       timings.endTime = performance.now();
       writePerformanceDataToFile('publicIntegrationTest_getMarketTrades', timings);
