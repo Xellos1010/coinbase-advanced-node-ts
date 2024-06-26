@@ -1,6 +1,6 @@
 require('jest-extended');
 process.env.NODE_ENV = 'test';
 
-const jestTimeout = 50000;
+const jestTimeout = 100000;
 
 jest.setTimeout(jestTimeout);

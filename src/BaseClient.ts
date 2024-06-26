@@ -66,6 +66,14 @@ class BaseClient {
   protected formatJWTUri(method: string, path: string): string {
     return `${method} ${this.baseURL}${path}`;
   }
+
+  protected isAuthenticated(): boolean {
+    return (
+      !!this.keyFile &&
+      !!this.keyFile.getKeyName() &&
+      !!this.keyFile.getKeySecret()
+    );
+  }
 }
 
 export default BaseClient;
