@@ -9,7 +9,7 @@ import PortfolioClient from "./rest/PortfolioClient";
 import PublicClient from "./rest/PublicClient";
 import KeyFileConfig from "./config/KeyFileConfig";
 import { LazyProxyHandler } from "./LazyProxyHandler";
-import BaseWebSocketClient from "./websocket/BaseWebSocketClient";
+import CoinbaseWSClient from "./websocket/CoinbaseWSClient";
 
 class CoinbaseClient extends BaseClient {
   public public?: PublicClient;
@@ -20,7 +20,7 @@ class CoinbaseClient extends BaseClient {
   public converts?: ConvertsClient;
   public payments?: PaymentMethodsClient;
   public portfolio?: PortfolioClient;
-  public websocket?: BaseWebSocketClient; 
+  public websocket?: CoinbaseWSClient; 
 
   constructor(config?: KeyFileConfig) {
     super(config);
@@ -29,7 +29,7 @@ class CoinbaseClient extends BaseClient {
     
     // Note: This needs to be loaded with a websocket config so we need to check if the config passed is a websocket config or
 
-    this.websocket = new Proxy({}, new LazyProxyHandler(() => new BaseWebSocketClient(this.keyFile), true, this.keyFile));
+    this.websocket = new Proxy({}, new LazyProxyHandler(() => new CoinbaseWSClient(this.keyFile), true, this.keyFile));
     
     if (this.keyFile) {
       this.orders = new Proxy({}, new LazyProxyHandler(() => new OrdersClient(this.keyFile), true, this.keyFile));

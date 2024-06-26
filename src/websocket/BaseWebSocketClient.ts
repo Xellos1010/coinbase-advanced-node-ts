@@ -7,7 +7,6 @@ import {
   WS_RETRY_BASE,
   WS_RETRY_FACTOR,
   WS_RETRY_MAX,
-  // USER_AGENT,
   SUBSCRIBE_MESSAGE_TYPE,
   UNSUBSCRIBE_MESSAGE_TYPE,
   WS_AUTH_CHANNELS,
@@ -27,36 +26,32 @@ class WSClientConnectionClosedException extends Error {
   }
 }
 
+interface SubscriptionMessage {
+  type: string;
+  product_ids: string[];
+  channels: string[];
+  jwt?: string;
+}
+
 class BaseWebSocketClient extends BaseClient {
   private ws?: WebSocket;
   private retryCount = 0;
   private subscriptions: { [key: string]: Set<string> } = {};
   private backgroundException?: Error;
   private retrying = false;
-  public retry = true; // Default to true, same as the Python version
+  public retry = true;
 
-  constructor(config?: KeyFileConfig) {
-    super(config);
-    this.baseURL = WS_BASE_URL;
+  constructor(configOrFilePath?: KeyFileConfig | string) {
+    super(configOrFilePath);
   }
 
-  /**
-   * Connect to the WebSocket server.
-   * @param urlPath - The path to the WebSocket endpoint.
-   */
   public connect(urlPath: string): void {
-    this.checkKeyFileConfig(); // Ensure config is available
+    this.checkKeyFileConfig();
+    const token = this.generateJWT();
+    const url = `wss://${WS_BASE_URL}${urlPath}?token=${token}`;
 
-    // Generate the JWT token
-    const token = this.generateJWT("GET", urlPath);
-
-    // Construct the WebSocket URL
-    const url = `wss://${this.baseURL}${urlPath}?token=${token}`;
-
-    // Create a new WebSocket connection
     this.ws = new WebSocket(url);
 
-    // Setup event listeners
     this.ws.on("open", this.onOpen);
     this.ws.on("message", this.onMessage);
     this.ws.on("error", this.onError);
@@ -76,9 +71,7 @@ class BaseWebSocketClient extends BaseClient {
 
   private onError = (error: Error): void => {
     logger.error(`WebSocket error: ${error.message}`);
-    this.backgroundException = new WSClientException(
-      `WebSocket error: ${error.message}`
-    );
+    this.backgroundException = new WSClientException(`WebSocket error: ${error.message}`);
   };
 
   private onClose = (): void => {
@@ -88,10 +81,6 @@ class BaseWebSocketClient extends BaseClient {
     }
   };
 
-  /**
-   * Send a message to the WebSocket server.
-   * @param message - The message to send.
-   */
   public sendMessage(message: string): void {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(message);
@@ -100,20 +89,12 @@ class BaseWebSocketClient extends BaseClient {
     }
   }
 
-  /**
-   * Close the WebSocket connection.
-   */
   public close(): void {
     if (this.ws) {
       this.ws.close();
     }
   }
 
-  /**
-   * Subscribe to a list of channels for a list of product ids.
-   * @param productIds - Product ids to subscribe to
-   * @param channels - Channels to subscribe to
-   */
   public async subscribe(
     productIds: string[],
     channels: string[]
@@ -121,9 +102,7 @@ class BaseWebSocketClient extends BaseClient {
     this.ensureWebSocketOpen();
     for (const channel of channels) {
       if (!this.isAuthenticated() && WS_AUTH_CHANNELS.has(channel)) {
-        throw new WSClientException(
-          "Unauthenticated request to private channel."
-        );
+        throw new WSClientException("Unauthenticated request to private channel.");
       }
 
       const message = this.buildSubscriptionMessage(
@@ -133,7 +112,6 @@ class BaseWebSocketClient extends BaseClient {
       );
       await this.wsSend(JSON.stringify(message));
 
-      // Add to subscriptions map
       if (!this.subscriptions[channel]) {
         this.subscriptions[channel] = new Set();
       }
@@ -141,11 +119,6 @@ class BaseWebSocketClient extends BaseClient {
     }
   }
 
-  /**
-   * Unsubscribe from a list of channels for a list of product ids.
-   * @param productIds - Product ids to unsubscribe from
-   * @param channels - Channels to unsubscribe from
-   */
   public async unsubscribe(
     productIds: string[],
     channels: string[]
@@ -153,9 +126,7 @@ class BaseWebSocketClient extends BaseClient {
     this.ensureWebSocketOpen();
     for (const channel of channels) {
       if (!this.isAuthenticated() && WS_AUTH_CHANNELS.has(channel)) {
-        throw new WSClientException(
-          "Unauthenticated request to private channel."
-        );
+        throw new WSClientException("Unauthenticated request to private channel.");
       }
 
       const message = this.buildSubscriptionMessage(
@@ -165,16 +136,12 @@ class BaseWebSocketClient extends BaseClient {
       );
       await this.wsSend(JSON.stringify(message));
 
-      // Remove from subscriptions map
       if (this.subscriptions[channel]) {
         productIds.forEach((id) => this.subscriptions[channel].delete(id));
       }
     }
   }
 
-  /**
-   * Unsubscribe from all channels.
-   */
   public async unsubscribeAll(): Promise<void> {
     for (const [channel, productIds] of Object.entries(this.subscriptions)) {
       await this.unsubscribe(Array.from(productIds), [channel]);
@@ -185,14 +152,12 @@ class BaseWebSocketClient extends BaseClient {
     productIds: string[],
     channel: string,
     type: string
-  ): object {
+  ): SubscriptionMessage {
     return {
       type,
       product_ids: productIds,
       channels: [channel],
-      ...(this.isAuthenticated()
-        ? { jwt: this.generateJWT("GET", channel) }
-        : {}),
+      ...(this.isAuthenticated() ? { jwt: this.generateJWT() } : {}),
     };
   }
 
@@ -236,9 +201,7 @@ class BaseWebSocketClient extends BaseClient {
       } else {
         this.retrying = false;
         this.subscriptions = {};
-        throw new WSClientConnectionClosedException(
-          "Max retry attempts reached."
-        );
+        throw new WSClientConnectionClosedException("Max retry attempts reached.");
       }
     };
     retry();
