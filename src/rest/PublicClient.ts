@@ -1,4 +1,4 @@
-import BaseClient from '../BaseClient';
+import BaseRestClient from './BaseRestClient';
 import {
   MarketTradesResponse,
   ServerTimeResponse,
@@ -8,7 +8,7 @@ import {
   ProductCandlesResponse
 } from './types/public';
 
-class PublicClient extends BaseClient {
+class PublicClient extends BaseRestClient {
   /**
    * **Get Server Time**
    * 
