@@ -23,3 +23,5 @@ export * from './SetIntradayMarginSettingResponse';
 export * from './ListPortfoliosParams';
 export * from './GetPortfolioBreakdownParams';
 export * from './GetCurrentMarginWindowParams';
+export * from './MovePortfolioFundsParams';
+export * from './CreatePortfolioParams';
