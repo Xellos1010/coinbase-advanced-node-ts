@@ -1,9 +1,9 @@
 // test/integration_tests/websocket/candlesChannel.integration.test.ts
-import CoinbaseClient from "../../../src/CoinbaseClient";
-import KeyFileConfig from "../../../src/config/KeyFileConfig";
-import { loadKeyfile } from "../../../src/config/KeyLoader";
-import BaseWebSocketClient from "../../../src/websocket/BaseWebSocketClient";
-import { testChannelSubscription } from "./utils/testChannelSubscription";
+import CoinbaseClient from '../../../src/CoinbaseClient';
+import KeyFileConfig from '../../../src/config/KeyFileConfig';
+import { loadKeyfile } from '../../../src/config/KeyLoader';
+import BaseWebSocketClient from '../../../src/websocket/BaseWebSocketClient';
+import { testChannelSubscription } from './utils/testChannelSubscription';
 
 const keyFile = process.env.KEY_FILENAME;
 const config = loadKeyfile(keyFile);

@@ -3,7 +3,7 @@ import { ListPaymentMethodsResponse } from '../../../src/rest/types/payment_meth
 import { GetPaymentMethodResponse } from '../../../src/rest/types/payment_methods/GetPaymentMethodResponse';
 import PaymentMethodsClient from '../../../src/rest/PaymentMethodsClient';
 
-const keyFile = process.env.KEY_FILENAME;
+const keyFile = process.env.KEY_FILENAME; //Example filepath in top level of Project Hierarchy: key/{insert_keyfile_name}.json
 
 describe('PaymentMethodsClient', () => {
   afterEach(() => {

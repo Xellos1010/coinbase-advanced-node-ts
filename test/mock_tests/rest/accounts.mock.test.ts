@@ -4,7 +4,7 @@ import { ListAccountsParams } from '../../../src/rest/types/accounts/ListAccount
 import { ListAccountsResponse } from '../../../src/rest/types/accounts/ListAccountsResponse';
 import AccountsClient from '../../../src/rest/AccountsClient';
 
-const keyFile = process.env.KEY_FILENAME;
+const keyFile = process.env.KEY_FILENAME; //Example filepath in top level of Project Hierarchy: key/{insert_keyfile_name}.json
 
 describe('AccountsClient', () => {
   afterEach(() => {

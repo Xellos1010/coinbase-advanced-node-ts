@@ -41,7 +41,7 @@ import CoinbaseClient from "../src/CoinbaseClient";
 import KeyFileConfig from "../src/config/KeyFileConfig";
 import { loadKeyfile } from "../src/config/KeyLoader";
 
-const keyFile = process.env.KEY_FILENAME;
+const keyFile = process.env.KEY_FILENAME; //Example filepath in top level of Project Hierarchy: key/{insert_keyfile_name}.json
 const config = loadKeyfile(keyFile);
 
 const client = new CoinbaseClient(

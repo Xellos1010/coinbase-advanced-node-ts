@@ -14,7 +14,7 @@ import {
   GetMarketTradesParams
 } from '../../../src/rest/types/public/publicParams';
 
-const keyFile = process.env.KEY_FILENAME;
+const keyFile = process.env.KEY_FILENAME; //Example filepath in top level of Project Hierarchy: key/{insert_keyfile_name}.json
 
 describe('PublicClient', () => {
   afterEach(() => {

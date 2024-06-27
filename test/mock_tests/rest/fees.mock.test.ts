@@ -2,7 +2,7 @@ import nock from 'nock';
 import FeesClient from '../../../src/rest/FeesClient';
 import { TransactionsSummaryResponse } from '../../../src/rest/types/fees/TransactionsSummaryResponse';
 
-const keyFile = process.env.KEY_FILENAME;
+const keyFile = process.env.KEY_FILENAME; //Example filepath in top level of Project Hierarchy: key/{insert_keyfile_name}.json
 // Constants for testing
 
 describe('FeesClient', () => {

@@ -1,4 +1,4 @@
-import BaseWebSocketClient from "./BaseWebSocketClient";
+import BaseWebSocketClient from './BaseWebSocketClient';
 import {
   CANDLES,
   HEARTBEATS,
@@ -8,17 +8,18 @@ import {
   TICKER,
   TICKER_BATCH,
   USER,
-} from "../config/constants";
-import { ProductIdsParams } from "./types";
+} from '../config/constants';
+import { ProductIdsParams } from './types';
 
 class CoinbaseWSClient extends BaseWebSocketClient {
 
   /**
    * Subscribe to heartbeats channel for a list of product_ids.
    * @param params - Object containing the list of product ids to subscribe to
+   * @param onMessage - Callback function to handle incoming messages
    */
-  public heartbeats(params: ProductIdsParams): void {
-    this.subscribe(params.productIds, [HEARTBEATS]);
+  public heartbeats(params: ProductIdsParams, onMessage: (message: any) => void): void {
+    this.subscribe(params.productIds, [HEARTBEATS], onMessage);
   }
 
   /**
@@ -32,9 +33,10 @@ class CoinbaseWSClient extends BaseWebSocketClient {
   /**
    * Subscribe to candles channel for a list of product_ids.
    * @param params - Object containing the list of product ids to subscribe to
+   * @param onMessage - Callback function to handle incoming messages
    */
-  public candles(params: ProductIdsParams): void {
-    this.subscribe(params.productIds, [CANDLES]);
+  public candles(params: ProductIdsParams, onMessage: (message: any) => void): void {
+    this.subscribe(params.productIds, [CANDLES], onMessage);
   }
 
   /**
@@ -48,9 +50,10 @@ class CoinbaseWSClient extends BaseWebSocketClient {
   /**
    * Subscribe to market trades channel for a list of product_ids.
    * @param params - Object containing the list of product ids to subscribe to
+   * @param onMessage - Callback function to handle incoming messages
    */
-  public marketTrades(params: ProductIdsParams): void {
-    this.subscribe(params.productIds, [MARKET_TRADES]);
+  public marketTrades(params: ProductIdsParams, onMessage: (message: any) => void): void {
+    this.subscribe(params.productIds, [MARKET_TRADES], onMessage);
   }
 
   /**
@@ -64,9 +67,10 @@ class CoinbaseWSClient extends BaseWebSocketClient {
   /**
    * Subscribe to status channel for a list of product_ids.
    * @param params - Object containing the list of product ids to subscribe to
+   * @param onMessage - Callback function to handle incoming messages
    */
-  public status(params: ProductIdsParams): void {
-    this.subscribe(params.productIds, [STATUS]);
+  public status(params: ProductIdsParams, onMessage: (message: any) => void): void {
+    this.subscribe(params.productIds, [STATUS], onMessage);
   }
 
   /**
@@ -80,9 +84,10 @@ class CoinbaseWSClient extends BaseWebSocketClient {
   /**
    * Subscribe to ticker channel for a list of product_ids.
    * @param params - Object containing the list of product ids to subscribe to
+   * @param onMessage - Callback function to handle incoming messages
    */
-  public ticker(params: ProductIdsParams): void {
-    this.subscribe(params.productIds, [TICKER]);
+  public ticker(params: ProductIdsParams, onMessage: (message: any) => void): void {
+    this.subscribe(params.productIds, [TICKER], onMessage);
   }
 
   /**
@@ -96,9 +101,10 @@ class CoinbaseWSClient extends BaseWebSocketClient {
   /**
    * Subscribe to ticker batch channel for a list of product_ids.
    * @param params - Object containing the list of product ids to subscribe to
+   * @param onMessage - Callback function to handle incoming messages
    */
-  public tickerBatch(params: ProductIdsParams): void {
-    this.subscribe(params.productIds, [TICKER_BATCH]);
+  public tickerBatch(params: ProductIdsParams, onMessage: (message: any) => void): void {
+    this.subscribe(params.productIds, [TICKER_BATCH], onMessage);
   }
 
   /**
@@ -112,9 +118,10 @@ class CoinbaseWSClient extends BaseWebSocketClient {
   /**
    * Subscribe to level2 channel for a list of product_ids.
    * @param params - Object containing the list of product ids to subscribe to
+   * @param onMessage - Callback function to handle incoming messages
    */
-  public level2(params: ProductIdsParams): void {
-    this.subscribe(params.productIds, [LEVEL2]);
+  public level2(params: ProductIdsParams, onMessage: (message: any) => void): void {
+    this.subscribe(params.productIds, [LEVEL2], onMessage);
   }
 
   /**
@@ -128,9 +135,10 @@ class CoinbaseWSClient extends BaseWebSocketClient {
   /**
    * Subscribe to user channel for a list of product_ids.
    * @param params - Object containing the list of product ids to subscribe to
+   * @param onMessage - Callback function to handle incoming messages
    */
-  public user(params: ProductIdsParams): void {
-    this.subscribe(params.productIds, [USER]);
+  public user(params: ProductIdsParams, onMessage: (message: any) => void): void {
+    this.subscribe(params.productIds, [USER], onMessage);
   }
 
   /**

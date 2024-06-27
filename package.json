@@ -23,6 +23,7 @@
     "typescript": "^5.4.5"
   },
   "scripts": {
+    "start:file": "ts-node",
     "clean": "rimraf dist",
     "prebuild": "yarn clean",
     "build": "npx tsc --build",

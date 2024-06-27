@@ -2,7 +2,7 @@ import nock from 'nock';
 import ProductsClient from '../../../src/rest/ProductsClient';
 import { GetProductBookParams, GetBestBidAskParams, GetProductBookResponse, GetMarketTradesResponse, GetProductCandlesResponse, GetProductResponse, ListProductsResponse, GetBestBidAskResponse, GetProductCandlesParams } from '../../../src/rest/types/products';
 
-const keyFile = process.env.KEY_FILENAME;
+const keyFile = process.env.KEY_FILENAME; //Example filepath in top level of Project Hierarchy: key/{insert_keyfile_name}.json
 
 describe('ProductsClient', () => {
   afterEach(() => {

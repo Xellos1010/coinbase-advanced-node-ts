@@ -1,12 +1,12 @@
-// test/utils/testChannelSubscription.ts
-import BaseWebSocketClient from "../../../../src/websocket/BaseWebSocketClient";
-import { startPerformanceTimings, recordStepTiming, writePerformanceDataToFile, Timings } from "../../../performanceUtils";
+// src/demos/utils/ChannelSubscription.ts
+import BaseWebSocketClient from "../../../websocket/BaseWebSocketClient";
+import { startPerformanceTimings, recordStepTiming, writePerformanceDataToFile, Timings } from "../../utils/performanceUtils";
 
-export async function testChannelSubscription(
+export async function ChannelSubscription(
   wsClient: BaseWebSocketClient,
   channel: string,
   logFileName: string,
-  onMessageSpy: jest.Mock,
+  onMessage: (message: any) => void,
   requiresAuth = false
 ): Promise<void> {
   const timings: Timings = startPerformanceTimings();
@@ -17,14 +17,12 @@ export async function testChannelSubscription(
     recordStepTiming(timings, 'connect', startConnect);
 
     const startSubscribe = performance.now();
-    await wsClient.subscribe(['BTC-USD'], [channel], onMessageSpy);
+    await wsClient.subscribe(['BTC-USD'], [channel], onMessage);
     recordStepTiming(timings, `subscribe_${channel}`, startSubscribe);
 
     console.log(`Subscribed to ${channel} channel`);
 
     await new Promise(res => setTimeout(res, 500));
-
-    expect(onMessageSpy).toHaveBeenCalled();
 
     const startUnsubscribe = performance.now();
     await wsClient.unsubscribe(['BTC-USD'], [channel]);

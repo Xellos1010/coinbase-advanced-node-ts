@@ -2,7 +2,7 @@ import WebSocket from 'ws';
 import CoinbaseWSClient from '../../../src/websocket/CoinbaseWSClient';
 import MockWebSocketServer from './mockWebSocketServer';
 import { WS_BASE_URL } from '../../../src/config/constants';
-const keyFile = process.env.KEY_FILENAME;
+const keyFile = process.env.KEY_FILENAME; //Example filepath in top level of Project Hierarchy: key/{insert_keyfile_name}.json
 
 jest.mock('ws');
 

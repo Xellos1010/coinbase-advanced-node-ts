@@ -51,10 +51,11 @@ export abstract class BaseWsChannel<T, U extends BaseMessage> {
     this.ws.send(JSON.stringify(message));
   }
 
-  startListening() {
+  startListening(onMessage: (message: any) => void) {
     this.ws.on('message', (data: WebSocket.Data) => {
       const parsedData: T = JSON.parse(data.toString());
       this.handleMessage(parsedData);
+      onMessage(parsedData); // Emit the message up
     });
   }
 }

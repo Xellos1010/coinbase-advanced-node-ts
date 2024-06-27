@@ -30,7 +30,7 @@ import {
 } from '../../../src/rest/types/portfolios';
 import PortfolioClient from '../../../src/rest/PortfolioClient';
 
-const keyFile = process.env.KEY_FILENAME;
+const keyFile = process.env.KEY_FILENAME; //Example filepath in top level of Project Hierarchy: key/{insert_keyfile_name}.json
 
 describe('PortfolioClient', () => {
   afterEach(() => {

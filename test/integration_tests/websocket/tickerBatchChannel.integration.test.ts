@@ -5,7 +5,7 @@ import { loadKeyfile } from "../../../src/config/KeyLoader";
 import BaseWebSocketClient from "../../../src/websocket/BaseWebSocketClient";
 import { testChannelSubscription } from "./utils/testChannelSubscription";
 
-const keyFile = process.env.KEY_FILENAME;
+const keyFile = process.env.KEY_FILENAME; //Example filepath in top level of Project Hierarchy: key/{insert_keyfile_name}.json
 const config = loadKeyfile(keyFile);
 
 describe('Coinbase API Integration Test - WebSocket Ticker Batch Channel', () => {

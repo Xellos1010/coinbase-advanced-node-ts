@@ -4,7 +4,7 @@ import { loadRestConfig } from "../../../src/config";
 import KeyFileConfig from "../../../src/config/KeyFileConfig";
 import { startPerformanceTimings, recordStepTiming, writePerformanceDataToFile, Timings } from "../../performanceUtils";
 
-const keyFile = process.env.KEY_FILENAME;
+const keyFile = process.env.KEY_FILENAME; //Example filepath in top level of Project Hierarchy: key/{insert_keyfile_name}.json
 const config = loadRestConfig(keyFile);
 
 describe('Coinbase API Integration Test - Orders', () => {

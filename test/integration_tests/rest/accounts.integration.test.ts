@@ -4,7 +4,7 @@ import { loadKeyfile } from "../../../src/config/KeyLoader";
 import { startPerformanceTimings, recordStepTiming, writePerformanceDataToFile, Timings } from "../../performanceUtils";
 import { ListAccountsParams } from "../../../src/rest/types/accounts/ListAccountsParams";
 
-const keyFile = process.env.KEY_FILENAME;
+const keyFile = process.env.KEY_FILENAME; //Example filepath in top level of Project Hierarchy: key/{insert_keyfile_name}.json
 const config = loadKeyfile(keyFile);
 
 describe('Coinbase API Integration Test - Accounts', () => {

@@ -29,6 +29,7 @@ class BaseWebSocketClient extends BaseClient {
   private retrying = false;
   private listenersAdded = false;
   public retry = true;
+  private eventHandlers: Map<string, (message: any) => void> = new Map();
 
   constructor(configOrFilePath?: KeyFileConfig | string) {
     super(configOrFilePath);
@@ -41,8 +42,8 @@ class BaseWebSocketClient extends BaseClient {
     this.ws.setMaxListeners(20);
 
     return new Promise((resolve, reject) => {
-      this.ws!.on("open", () => {
-        logger.info("WebSocket connection opened.");
+      this.ws!.on('open', () => {
+        logger.info('WebSocket connection opened.');
         if (this.retrying) {
           this.resubscribe();
         }
@@ -50,20 +51,12 @@ class BaseWebSocketClient extends BaseClient {
       });
 
       if (!this.listenersAdded) {
-        this.ws!.on("message", this.onMessage);
-        this.ws!.on("error", this.onError);
-        this.ws!.on("close", this.onClose);
+        this.ws!.on('error', this.onError);
+        this.ws!.on('close', this.onClose);
         this.listenersAdded = true;
       }
     });
   }
-
-  private onMessage = (data: WebSocket.Data): void => {
-    logger.info(`Received: ${data}`);
-    this.channels.forEach(channel => {
-      channel.startListening();  // Ensure that the startListening is invoked
-    });
-  };
 
   private onError = (error: Error): void => {
     logger.error(`WebSocket error: ${error.message}`);
@@ -71,7 +64,7 @@ class BaseWebSocketClient extends BaseClient {
   };
 
   private onClose = (): void => {
-    logger.info("WebSocket connection closed.");
+    logger.info('WebSocket connection closed.');
     if (this.retry) {
       this.retryConnection();
     }
@@ -86,29 +79,39 @@ class BaseWebSocketClient extends BaseClient {
 
   private async closeAsync(): Promise<void> {
     if (this.ws) {
-      this.ws.removeAllListeners();  // Clean up all listeners
-      await new Promise<void>((resolve) => this.ws!.once("close", resolve));
+      logger.info('Initiating WebSocket closure...');
+      this.ws.removeAllListeners();
+      const closePromise = new Promise<void>((resolve) => {
+        this.ws!.once('close', () => {
+          logger.info('WebSocket "close" event received.');
+          resolve();
+        });
+      });
+      this.ws.close();
+      await closePromise;
+      logger.info('Terminating WebSocket connection after close event...');
+      this.ws.terminate();
       this.ws = undefined;
       this.channels.clear();
-      logger.info("WebSocket connection closed.");
-      this.listenersAdded = false;  // Reset the flag
+      logger.info('WebSocket connection terminated.');
+      this.listenersAdded = false;
     }
   }
 
   public async subscribe(
     productIds: string[],
-    channels: string[]
+    channels: string[],
+    onMessage: (message: any) => void
   ): Promise<void> {
     this.ensureWebSocketOpen();
     for (const channel of channels) {
       if (!this.isAuthenticated() && WS_AUTH_CHANNELS.has(channel)) {
-        throw new WSClientException("Unauthenticated request to private channel.");
+        throw new WSClientException('Unauthenticated request to private channel.');
       }
 
       const jwt = this.isAuthenticated() ? this.generateJWT() : undefined;
       const channelKey = this.getChannelKey(channel, productIds);
 
-      // Check if the channel is already open and active
       if (this.channels.has(channelKey) && this.ws && this.ws.readyState === WebSocket.OPEN) {
         logger.info(`Channel ${channelKey} is already active. Skipping subscription.`);
         continue;
@@ -116,8 +119,9 @@ class BaseWebSocketClient extends BaseClient {
 
       const channelInstance = this.getChannelInstance(channel, productIds, jwt);
       channelInstance.subscribe();
-      channelInstance.startListening();  // Ensure startListening is called for each channel
+      channelInstance.startListening(onMessage);
       this.channels.set(channelKey, channelInstance);
+      this.eventHandlers.set(channelKey, onMessage);  // Store the event handler
     }
   }
 
@@ -128,7 +132,7 @@ class BaseWebSocketClient extends BaseClient {
     this.ensureWebSocketOpen();
     for (const channel of channels) {
       if (!this.isAuthenticated() && WS_AUTH_CHANNELS.has(channel)) {
-        throw new WSClientException("Unauthenticated request to private channel.");
+        throw new WSClientException('Unauthenticated request to private channel.');
       }
 
       const channelKey = this.getChannelKey(channel, productIds);
@@ -136,6 +140,7 @@ class BaseWebSocketClient extends BaseClient {
       if (channelInstance) {
         channelInstance.unsubscribe();
         this.channels.delete(channelKey);
+        this.eventHandlers.delete(channelKey);  // Remove the stored event handler
       }
     }
   }
@@ -145,6 +150,7 @@ class BaseWebSocketClient extends BaseClient {
       channelInstance.unsubscribe();
     }
     this.channels.clear();
+    this.eventHandlers.clear();  // Clear all stored event handlers
   }
 
   private getChannelKey(channel: string, productIds: string[]): string {
@@ -176,14 +182,17 @@ class BaseWebSocketClient extends BaseClient {
 
   private ensureWebSocketOpen(): void {
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
-      throw new WSClientException("WebSocket is not open.");
+      throw new WSClientException('WebSocket is not open.');
     }
   }
 
   private async resubscribe(): Promise<void> {
     for (const [channelKey, channelInstance] of this.channels.entries()) {
-      channelInstance.subscribe();
-      channelInstance.startListening();  // Ensure startListening is called during resubscribe
+      const onMessage = this.eventHandlers.get(channelKey);
+      if (onMessage) {
+        channelInstance.subscribe();
+        channelInstance.startListening(onMessage);
+      }
     }
   }
 
@@ -195,9 +204,9 @@ class BaseWebSocketClient extends BaseClient {
         this.retryCount += 1;
         try {
           logger.info(`Retrying connection attempt ${this.retryCount}`);
-          await this.connect("");
+          await this.connect('');
           this.retrying = false;
-          return; // Exit the retry loop if connection is successful
+          return;
         } catch (error) {
           logger.error(`Retry attempt ${this.retryCount} failed.`);
           this.sleepWithExceptionCheck(
@@ -208,7 +217,7 @@ class BaseWebSocketClient extends BaseClient {
       }
       this.retrying = false;
       this.channels.clear();
-      throw new WSClientConnectionClosedException("Max retry attempts reached.");
+      throw new WSClientConnectionClosedException('Max retry attempts reached.');
     };
     retry();
   }
@@ -219,7 +228,6 @@ class BaseWebSocketClient extends BaseClient {
       if (this.backgroundException) {
         throw this.backgroundException;
       }
-      // Sleep for a short duration to avoid busy-waiting
       Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100);
     }
   }
