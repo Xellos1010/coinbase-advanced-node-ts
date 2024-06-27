@@ -1,0 +1,26 @@
+# Exclude everything...
+*
+
+# ...except the following:
+!dist
+!dist/**
+
+# Other files and folders to exclude
+src
+node_modules
+tsconfig.json
+.npmignore
+jest.config.js
+*.spec.ts
+*.test.ts
+coverage
+.gitignore
+.env
+testResults
+test
+key
+demo-performance-stats
+package-lock.json
+yarn.lock
+README.md
+LICENSE

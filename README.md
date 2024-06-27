@@ -8,9 +8,9 @@ Based on the [Official Coinbase Python](https://github.com/coinbase/coinbase-adv
 
 ## Features
 
-- **REST API Support**: Comprehensive access to Coinbase's REST endpoints. **WIP**
-- **WebSocket API Support**: Planned for future implementation. **WIP**
-- **Authenticated and Public Endpoints**: Support for both authenticated and public API requests. **WIP**
+- **REST API Support**: Comprehensive access to Coinbase's REST endpoints.
+- **WebSocket API Support**: Websocket Channel Management and Event Handling with retry mechanisms.
+- **Authenticated and Public Endpoints**: Support for both authenticated and public API requests.
 - **Proxy Pattern for Lazy Initialization**: Efficient initialization of clients using the Proxy pattern.
 
 ## Installation
@@ -55,6 +55,14 @@ const client = new CoinbaseClient(
 const accountsData = await client.accounts?.listAccounts();
 ```
 
+### Demos
+
+All demo scripts are executable from the root directory. If you want to use specific credentials with a demo script, simply add a .env file to the root of this package
+
+npx ts-node ./src/demo/dump-candles.ts
+
+Tip: There is a .env.defaults file which serves as a template. Just remove its .defaults extension and enter your credentials to get started. Do not commit this file (or your credentials) to any repository!
+
 ### Executing Tests
 
 #### Executing a Single Test
@@ -74,64 +82,79 @@ run the command yarn build
 
 #### Authenticated Endpoints
 
-| Endpoint                       | Method | Resource                                | Status     |
-| ------------------------------ | ------ | --------------------------------------- | ---------- |
-| List Accounts                  | GET    | /accounts                               | Tested     |
-| Get Account                    | GET    | /accounts/:account_id                   | Tested     |
-| Create Order                   | POST   | /orders                                 | Tested     |
-| Cancel Orders                  | POST   | /orders/batch_cancel                    | Not Tested |
-| List Orders                    | GET    | /orders/historical/batch                | Not Tested |
-| List Fills                     | GET    | /orders/historical/fills                | Tested     |
-| Get Order                      | GET    | /orders/historical/{order_id}           | Not Tested |
-| Preview Orders                 | POST   | /orders/preview                         | Not Tested |
-| Get Best Bid/Ask               | GET    | /best_bid_ask                           | Not Tested |
-| Get Product Book               | GET    | /product_book                           | Not Tested |
-| List Products                  | GET    | /products                               | Tested     |
-| Get Product                    | GET    | /products/{product_id}                  | Tested     |
-| Get Product Candles            | GET    | /products/{product_id}/candles          | Not Tested |
-| Get Market Trades              | GET    | /products/{product_id}/ticker           | Tested     |
-| Get Transactions Summary       | GET    | /transaction_summary                    | Not Tested |
-| Create Convert Quote           | POST   | /convert/quote                          | Not Tested |
-| Commit Convert Trade           | POST   | /convert/{trade_id}                     | Not Tested |
-| Get Convert Trade              | GET    | /convert/{trade_id}                     | Not Tested |
-| List Portfolios                | GET    | /portfolios                             | Not Tested |
-| Create Portfolio               | POST   | /portfolios                             | Not Tested |
-| Move Portfolio Funds           | POST   | /portfolios                             | Not Tested |
-| Get Portfolio Breakdown        | GET    | /portfolios                             | Not Tested |
-| Delete Portfolio               | DELETE | /portfolios                             | Not Tested |
-| Edit Portfolio                 | PUT    | /portfolios                             | Not Tested |
-| Get Futures Balance Summary    | GET    | /cfm/balance_summary                    | Not Tested |
-| List Futures Positions         | GET    | /cfm/positions                          | Not Tested |
-| Get Futures Position           | GET    | /cfm/positions/{product_id}             | Not Tested |
-| Schedule Futures Sweep         | POST   | /cfm/sweeps/schedule                    | Not Tested |
-| List Futures Sweeps            | GET    | /cfm/sweeps                             | Not Tested |
-| Cancel Futures Sweep           | DELETE | /cfm/sweeps                             | Not Tested |
-| Get Intraday Margin Setting    | GET    | /cfm/intraday/margin_setting            | Not Tested |
-| Set Intraday Margin Setting    | POST   | /cfm/intraday/margin_setting            | Not Tested |
-| Get Current Margin Window      | GET    | /cfm/intraday/current_margin_window     | Not Tested |
-| Get Perpetuals Portfolio Summary| GET    | /intx/portfolio                        | Not Tested |
-| List Perpetuals Positions      | GET    | /intx/positions                         | Not Tested |
-| Get Perpetuals Position        | GET    | /intx/positions                         | Not Tested |
-| Get Perpetuals Portfolio Balances| GET   | /intx/balances                         | Not Tested |
-| Opt-In Multi Asset Collateral  | POST   | /intx/multi_asset_collateral            | Not Tested |
-| Allocate Portfolio             | POST   | /intx/allocate                          | Not Tested |
-| List Payment Methods           | GET    | /payment_methods                        | Not Tested |
-| Get Payment Method             | GET    | /payment_methods/{payment_method_id}    | Not Tested |
+| Endpoint                       | Method | Resource                                | Status |
+| ------------------------------ | ------ | --------------------------------------- | ------ |
+| List Accounts                  | GET    | /accounts                               | Tested |
+| Get Account                    | GET    | /accounts/:account_id                   | Tested |
+| Create Order                   | POST   | /orders                                 | Tested |
+| Cancel Orders                  | POST   | /orders/batch_cancel                    | Tested |
+| List Orders                    | GET    | /orders/historical/batch                | Tested |
+| List Fills                     | GET    | /orders/historical/fills                | Tested |
+| Get Order                      | GET    | /orders/historical/{order_id}           | Tested |
+| Preview Orders                 | POST   | /orders/preview                         | Tested |
+| Get Best Bid/Ask               | GET    | /best_bid_ask                           | Tested |
+| Get Product Book               | GET    | /product_book                           | Tested |
+| List Products                  | GET    | /products                               | Tested |
+| Get Product                    | GET    | /products/{product_id}                  | Tested |
+| Get Product Candles            | GET    | /products/{product_id}/candles          | Tested |
+| Get Market Trades              | GET    | /products/{product_id}/ticker           | Tested |
+| Get Transactions Summary       | GET    | /transaction_summary                    | Tested |
+| Create Convert Quote           | POST   | /convert/quote                          | Tested |
+| Commit Convert Trade           | POST   | /convert/{trade_id}                     | Tested |
+| Get Convert Trade              | GET    | /convert/{trade_id}                     | Tested |
+| List Portfolios                | GET    | /portfolios                             | Tested |
+| Create Portfolio               | POST   | /portfolios                             | Tested |
+| Move Portfolio Funds           | POST   | /portfolios                             | Tested |
+| Get Portfolio Breakdown        | GET    | /portfolios                             | Tested |
+| Delete Portfolio               | DELETE | /portfolios                             | Tested |
+| Edit Portfolio                 | PUT    | /portfolios                             | Tested |
+| Get Futures Balance Summary    | GET    | /cfm/balance_summary                    | Tested |
+| List Futures Positions         | GET    | /cfm/positions                          | Tested |
+| Get Futures Position           | GET    | /cfm/positions/{product_id}             | Tested |
+| Schedule Futures Sweep         | POST   | /cfm/sweeps/schedule                    | Tested |
+| List Futures Sweeps            | GET    | /cfm/sweeps                             | Tested |
+| Cancel Futures Sweep           | DELETE | /cfm/sweeps                             | Tested |
+| Get Intraday Margin Setting    | GET    | /cfm/intraday/margin_setting            | Tested |
+| Set Intraday Margin Setting    | POST   | /cfm/intraday/margin_setting            | Tested |
+| Get Current Margin Window      | GET    | /cfm/intraday/current_margin_window     | Tested |
+| Get Perpetuals Portfolio Summary| GET    | /intx/portfolio                        | Tested |
+| List Perpetuals Positions      | GET    | /intx/positions                         | Tested |
+| Get Perpetuals Position        | GET    | /intx/positions                         | Tested |
+| Get Perpetuals Portfolio Balances| GET   | /intx/balances                         | Tested |
+| Opt-In Multi Asset Collateral  | POST   | /intx/multi_asset_collateral            | Tested |
+| Allocate Portfolio             | POST   | /intx/allocate                          | Tested |
+| List Payment Methods           | GET    | /payment_methods                        | Tested |
+| Get Payment Method             | GET    | /payment_methods/{payment_method_id}    | Tested |
 
 #### Public Endpoints
 
-| Endpoint                   | Method | Resource                       | Status     |
-| -------------------------- | ------ | ------------------------------------- | ---------- |
-| Get Server Time            | GET    | /time                                 | Not Tested |
-| Get Public Product Book    | GET    | /market/product_book                  | Not Tested |
-| List Public Products       | GET    | /market/products                      | Tested     |
-| Get Public Product         | GET    | /market/products/{product_id}         | Tested     |
-| Get Public Product Candles | GET    | /market/products/{product_id}/candles | Not Tested |
-| Get Public Market Trades   | GET    | /market/products/{product_id}/ticker  | Tested     |
+| Endpoint                   | Method | Resource                              | Status |
+| -------------------------- | ------ | ------------------------------------- | ------ |
+| Get Server Time            | GET    | /time                                 | Tested |
+| Get Public Product Book    | GET    | /market/product_book                  | Tested |
+| List Public Products       | GET    | /market/products                      | Tested |
+| Get Public Product         | GET    | /market/products/{product_id}         | Tested |
+| Get Public Product Candles | GET    | /market/products/{product_id}/candles | Tested |
+| Get Public Market Trades   | GET    | /market/products/{product_id}/ticker  | Tested |
 
+#### Websocket Channels
+| Endpoint         | Status |
+| -----------------| ------ |
+| Candles          | Tested |
+| Heartbeat        | Tested |
+| Level2           | Tested |
+| MarketTrades     | Tested |
+| Status           | Tested |
+| Ticker           | Tested |
+| TickerBatch      | Tested |
+| User             | Tested |
 ## Contributing
 
 Contributions are welcome! Please submit a pull request or open an issue to discuss improvements or bugs.
+
+### ⭐️ Show your support ⭐️
+
+Please leave a star if you find this project useful.
 
 ## License
 
