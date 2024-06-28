@@ -13,6 +13,10 @@ Based on the [Official Coinbase Python](https://github.com/coinbase/coinbase-adv
 - **Authenticated and Public Endpoints**: Support for both authenticated and public API requests.
 - **Proxy Pattern for Lazy Initialization**: Efficient initialization of clients using the Proxy pattern.
 
+## Installation
+
+use git clone https://github.com/Xellos1010/coinbase-advanced-node-ts to clone this repo 
+
 ## Getting Started
 
 ### Configuration
@@ -55,9 +59,24 @@ const accountsData = await client.accounts?.listAccounts();
 
 All demo scripts are executable from the root directory. If you want to use specific credentials with a demo script, simply add a .env file to the root of this package
 
-npx ts-node ./demo/dump-candles.ts
+npx ts-node ./src/demo/dump-candles.ts
 
 Tip: There is a .env.defaults file which serves as a template. Just remove its .defaults extension and enter your credentials to get started. Do not commit this file (or your credentials) to any repository!
+
+### Executing Tests
+
+#### Executing a Single Test
+
+Run the command yarn test:single test/public.integration.test.ts
+You have to that '/' pointing to the test you want to run.
+
+#### Executing all tests
+
+Run the command yarn test
+
+### Building the Project
+
+run the command yarn build
 
 ### Checklist of Endpoints Tested
 
@@ -139,5 +158,5 @@ Please leave a star if you find this project useful.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/Xellos1010/coinbase-advanced-node-ts/blob/main/LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 ```
