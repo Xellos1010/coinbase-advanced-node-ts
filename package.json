@@ -1,6 +1,6 @@
 {
   "name": "coinbase-advanced-node-ts",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A ChatGPT assisted conversation of the Coinbase advanced API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
